@@ -1,10 +1,10 @@
+require('dotenv').config()
 const fastify = require('fastify')({
     logger: true
 });
 const connectDB = require('./connect/connect');
 const authRoutes = require('./routes/authRoutes.js');
 const User = require('./models/User')
-// const errorHandler = require('./plugins/errorHandler.js')
 
 const { StatusCodes } = require('http-status-codes');
 

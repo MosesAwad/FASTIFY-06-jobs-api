@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs')
 const CustomError = require('../errors')
 const { StatusCodes } = require('http-status-codes');
+const jwt = require('jsonwebtoken');
 
 class User {
     constructor(db) {
@@ -26,10 +27,26 @@ class User {
             'INSERT INTO users (name, email, password) VALUES (?,?,?)',
             [name, email, hashedPassword]
         );
+        return { id: lastID, name, email, hashedPassword };
+    }
 
-        const token = "temp token";
-        return { user: { name }, token };
-        // return { id: lastID, name, email, hashedPassword };
+    async findByEmail(email) {
+        const user = await this.db.get(
+          'SELECT * FROM users WHERE email = ?', 
+          [email]
+        );
+        return user;
+    }
+
+    async comparePassword(candidatePassword, userPassword) {
+        const isMatch = await bcrypt.compare(candidatePassword, userPassword);
+        return isMatch;
+    }
+
+    createJWT(user) {
+        return jwt.sign({ userId: user.id, name: user.name }, process.env.JWT_SECRET, {
+                expiresIn: '30d'
+            })
     }
 }
 
