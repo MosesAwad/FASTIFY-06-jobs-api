@@ -9,6 +9,7 @@ class User {
     }
 
     async initTable() {
+        // await this.db.exec('PRAGMA foreign_keys = ON;'); // to force FOREIGN_KEY Enforcement
         await this.db.exec(`
             CREATE TABLE IF NOT EXISTS users(
                 id INTEGER PRIMARY KEY,

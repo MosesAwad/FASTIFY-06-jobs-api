@@ -4,21 +4,24 @@ const fastify = require('fastify')({
 });
 const connectDB = require('./connect/connect');
 const authRoutes = require('./routes/authRoutes.js');
-const User = require('./models/User')
-
-const { StatusCodes } = require('http-status-codes');
+const jobRoutes = require('./routes/jobRoutes.js');
+const User = require('./models/User');
+const Job = require('./models/Job')
 
 const start = async () => {
     try {
         // 1. Connect to DB
-        const userDB = await connectDB('users');
+        const db = await connectDB('application');
 
         // 2. Initiliaze models
-        const userModel = new User(userDB);
+        const userModel = new User(db);
         await userModel.initTable();
-    
+        const jobModel = new Job(db);
+        await jobModel.initTable();
+
         // 3. Register routes
         fastify.register(authRoutes, { userModel });
+        fastify.register(jobRoutes, { jobModel });
 
         // 4. Start server
         await fastify.listen({ port: 3000 });
