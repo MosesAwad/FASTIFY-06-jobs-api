@@ -29,8 +29,10 @@ class Job {
 		return { id: lastID, role, company, status, createdBy };
 	}
 
-	async getAllJobs({ userId }) {	// only the ones created by the user of course
-		return this.db.all(
+	async getAllJobs({ userId }) {	// gets all the jobs that were created by the user only
+		return this.db.all(		// no need to use await here because we return the promise and it is 
+								// awaited by in the controller, so it resolves there and we return 
+								// whatever this.db.all() resolves to   
 			`SELECT jobs.*, users.name AS creator_name 
 			FROM jobs
 			INNER JOIN users ON jobs.created_by = users.id
@@ -46,11 +48,6 @@ class Job {
 		);
 	}
 
-	/*
-		* STATUS MUST BE IN ENUM VALS
-		* UPDATED_AT
-
-	*/
 	async updateJob({ jobId, userId }, payload) {
 		const allowedFields = ['role', 'company', 'status'];
 		const keys = Object.keys(payload).filter((key) => allowedFields.includes(key))
@@ -61,12 +58,19 @@ class Job {
 			setClause += ', '
 			setClause += keys.map((key) => `${key} = ?`).join(', ');
 		}
-		console.log(setClause);
+
 		const query = `UPDATE jobs SET ${setClause} WHERE id = ? AND created_by = ? RETURNING *`;
-		console.log(query);
 		const result = await this.db.get(query, ...values, jobId, userId);
-		console.log(result);
 		return result;
+	}
+
+	async deleteJob ({ jobId, userId }) {
+		const { changes } = await this.db.run(
+			`DELETE FROM jobs WHERE id = ? AND created_by = ?`,
+			[jobId, userId]
+		);
+
+		return changes;
 	}
 }
 

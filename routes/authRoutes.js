@@ -2,11 +2,11 @@ const { registerOpts, loginOpts } = require('../schemas/authSchemas');
 
 async function authRoutes(fastify, options) {
     const { userModel } = options;
-    const authController = require('../controllers/authController')(userModel);
+    const { errorHandler, register, login } = require('../controllers/authController')(userModel);
   
-    fastify.setErrorHandler(authController.errorHandler);
-    fastify.post('/register', registerOpts, authController.register);
-    fastify.post('/login', loginOpts, authController.login);
+    fastify.setErrorHandler(errorHandler);
+    fastify.post('/register', registerOpts, register);
+    fastify.post('/login', loginOpts, login);
 }
 
 module.exports = authRoutes;
