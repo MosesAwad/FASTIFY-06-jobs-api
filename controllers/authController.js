@@ -32,13 +32,13 @@ module.exports = (userModel) => ({		// Note 1
 		
 			// Handle SQLite UNIQUE constraint violation
 			if (err.code === 'SQLITE_CONSTRAINT') {
-			customError.statusCode = StatusCodes.BAD_REQUEST;
-			if (err.message.includes('UNIQUE constraint failed')) {
-				const field = err.message.split(':').pop()?.trim(); // Note 1
-				customError.msg = `Duplicate value for field: ${field}`;
-			} else {
-				customError.msg = 'Database constraint violation';
-			}
+				customError.statusCode = StatusCodes.BAD_REQUEST;
+				if (err.message.includes('UNIQUE constraint failed')) {
+					const field = err.message.split(':').pop()?.trim(); // Note 1
+					customError.msg = `Duplicate value for field: ${field}`;
+				} else {
+					customError.msg = 'Database constraint violation';
+				}
 			}
 			reply.status(customError.statusCode).send({ error: customError.msg });
 		}

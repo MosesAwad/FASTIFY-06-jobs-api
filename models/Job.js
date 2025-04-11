@@ -28,6 +28,46 @@ class Job {
 		);
 		return { id: lastID, role, company, status, createdBy };
 	}
+
+	async getAllJobs({ userId }) {	// only the ones created by the user of course
+		return this.db.all(
+			`SELECT jobs.*, users.name AS creator_name 
+			FROM jobs
+			INNER JOIN users ON jobs.created_by = users.id
+			WHERE jobs.created_by = ?`,
+			[userId]
+		);
+	}
+
+	async getSingleJob({ jobId, userId }) {
+		return this.db.get(
+			`SELECT * FROM jobs WHERE id= ? AND created_by = ?`,
+			[jobId, userId]
+		);
+	}
+
+	/*
+		* STATUS MUST BE IN ENUM VALS
+		* UPDATED_AT
+
+	*/
+	async updateJob({ jobId, userId }, payload) {
+		const allowedFields = ['role', 'company', 'status'];
+		const keys = Object.keys(payload).filter((key) => allowedFields.includes(key))
+		const values = keys.map((key) => payload[key]);
+
+		let setClause = 'updated_at = CURRENT_TIMESTAMP';
+		if (keys.length) {
+			setClause += ', '
+			setClause += keys.map((key) => `${key} = ?`).join(', ');
+		}
+		console.log(setClause);
+		const query = `UPDATE jobs SET ${setClause} WHERE id = ? AND created_by = ? RETURNING *`;
+		console.log(query);
+		const result = await this.db.get(query, ...values, jobId, userId);
+		console.log(result);
+		return result;
+	}
 }
 
 module.exports = Job;
