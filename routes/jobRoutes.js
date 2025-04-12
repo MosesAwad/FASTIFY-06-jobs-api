@@ -1,6 +1,6 @@
 
 const authPlugin = require('../plugins/authentication');
-
+const { createJobOpts, updateJobOpts } = require('../schemas/jobSchemas');
 
 async function jobRoutes(fastify, options) {
     const { jobModel } = options;
@@ -18,10 +18,10 @@ async function jobRoutes(fastify, options) {
 
 	fastify.setErrorHandler(errorHandler);
 
-	fastify.post('/jobs', createJob);
+	fastify.post('/jobs', createJobOpts, createJob);
 	fastify.get('/jobs', getAllJobs);
 	fastify.get('/jobs/:id', getJob);
-	fastify.patch('/jobs/:id', updateJob);
+	fastify.patch('/jobs/:id', updateJobOpts, updateJob);
 	fastify.delete('/jobs/:id', deleteJob);
 }
 

@@ -54,19 +54,14 @@ module.exports = (jobModel) => ({
 			msg: err.message || 'Something went wrong, try again later',
 		};
 	
-		// Handle SQLite UNIQUE constraint violation
-		if (err.code === 'SQLITE_CONSTRAINT') {
-			customError.statusCode = StatusCodes.BAD_REQUEST;
-			if (err.message.includes('CHECK constraint failed')) {
-				const fieldMessage = err.message.split(':').pop()?.trim();
-				const field = fieldMessage?.trim().split(' ')[0];
-				const values = fieldMessage?.trim().split('(').pop()
-				customError.msg = `Invalid value for the '${field}' field. Please ensure the value is one of the allowed options: (${values}.`;
-			}
-			else {
-				customError.msg = 'Database constraint violation';
+		// Handle error thrown by fastify if user input validates our defined schemas
+		if (err.code === 'FST_ERR_VALIDATION') {
+			if (err.validation[0].instancePath === '/status') {
+				const newErrorMessage = [err.validation[0].instancePath, err.validation[0].message , "-> (pending, interview, declined)"]
+				customError.msg = newErrorMessage.join(' ')
 			}
 		}
+
 		reply.status(customError.statusCode).send({ error: customError.msg });
 	}
 });

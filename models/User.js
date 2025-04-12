@@ -9,7 +9,6 @@ class User {
     }
 
     async initTable() {
-        // await this.db.exec('PRAGMA foreign_keys = ON;'); // to force FOREIGN_KEY Enforcement
         await this.db.exec(`
             CREATE TABLE IF NOT EXISTS users(
                 id INTEGER PRIMARY KEY,
@@ -17,7 +16,7 @@ class User {
                 email STRING NOT NULL UNIQUE CHECK(email LIKE '%@%.%'),
                 password STRING NOT NULL CHECK(length(password) >= 6)
             )
-            `);
+        `);
     }
 
     async createUser({ name, email, password }) {

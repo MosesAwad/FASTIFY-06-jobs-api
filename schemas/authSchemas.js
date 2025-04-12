@@ -32,15 +32,15 @@ const registerOpts =  {
   
 const loginOpts = {
 	schema: {
-	body: {
-		type: 'object',
-		properties: {
-		'email': { type: 'string', },
-		'password': { type: 'string' }
+		body: {
+			type: 'object',
+			properties: {
+			'email': { type: 'string', },
+			'password': { type: 'string' }
+			},
+			required: ["email", "password"]
 		},
-		required: ["email", "password"]
-	},
-	response: responseSchema
+		response: responseSchema
 	}
 }
 
